@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -29,36 +29,6 @@ export default function App() {
 
   const removeToast = useCallback((id: number) => {
     setToasts(prev => prev.filter(t => t.id !== id));
-  }, []);
-
-  useEffect(() => {
-    // JS load হয়েছে — সব কিছু visible করো
-    document.documentElement.classList.add('js-loaded');
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-          }
-        });
-      },
-      { threshold: 0.05, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    // সব animate-on-scroll element observe করো
-    const animatedEls = document.querySelectorAll('.animate-on-scroll');
-    animatedEls.forEach(el => observer.observe(el));
-
-    // যেগুলো এখনই screen এ আছে সেগুলো সাথে সাথে দেখাও
-    animatedEls.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight + 100) {
-        el.classList.add('is-visible');
-      }
-    });
-
-    return () => observer.disconnect();
   }, []);
 
   return (

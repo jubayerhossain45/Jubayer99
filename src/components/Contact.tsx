@@ -44,7 +44,7 @@ export default function Contact({ showToast }: ContactProps) {
     setLoading(true);
 
     try {
-      const response = await fetch('https://jubayer99.onrender.com/api/contact', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -68,7 +68,7 @@ export default function Contact({ showToast }: ContactProps) {
   return (
     <section id="contact" className="contact section">
       <div className="container">
-        <div className="section__header animate-on-scroll">
+        <div className="section__header">
           <span className="section__tag">Get In Touch</span>
           <h2 className="section__title">Let's Work Together</h2>
           <div className="section__line" />
@@ -78,8 +78,7 @@ export default function Contact({ showToast }: ContactProps) {
         </div>
 
         <div className="contact__grid">
-          {/* Left: Info */}
-          <div className="contact__info animate-on-scroll">
+          <div className="contact__info">
             <h3 className="contact__info-title">Contact Information</h3>
             <p className="contact__info-desc">
               I'm currently available for freelance projects and full-time opportunities.
@@ -88,7 +87,7 @@ export default function Contact({ showToast }: ContactProps) {
 
             <div className="contact__socials">
               {SOCIAL_LINKS.map(link => (
-                <a
+                
                   key={link.name}
                   href={link.href}
                   target="_blank"
@@ -113,36 +112,25 @@ export default function Contact({ showToast }: ContactProps) {
             </div>
           </div>
 
-          {/* Right: Form */}
-          <div className="contact__form-wrapper animate-on-scroll">
-            <form id="contactForm" className="contact-form" onSubmit={handleSubmit} noValidate>
+          <div className="contact__form-wrapper">
+            <form className="contact-form" onSubmit={handleSubmit} noValidate>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="name" className="form-label">Full Name *</label>
                   <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    className="form-input"
-                    placeholder="John Doe"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
+                    id="name" name="name" type="text"
+                    className="form-input" placeholder="John Doe"
+                    value={form.name} onChange={handleChange}
+                    required disabled={loading}
                   />
                 </div>
                 <div className="form-group">
                   <label htmlFor="email" className="form-label">Email Address *</label>
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="form-input"
-                    placeholder="john@example.com"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
+                    id="email" name="email" type="email"
+                    className="form-input" placeholder="john@example.com"
+                    value={form.email} onChange={handleChange}
+                    required disabled={loading}
                   />
                 </div>
               </div>
@@ -150,57 +138,41 @@ export default function Contact({ showToast }: ContactProps) {
               <div className="form-group">
                 <label htmlFor="subject" className="form-label">Subject *</label>
                 <input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  className="form-input"
-                  placeholder="Project Inquiry / Collaboration / General"
-                  value={form.subject}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
+                  id="subject" name="subject" type="text"
+                  className="form-input" placeholder="Project Inquiry / Collaboration / General"
+                  value={form.subject} onChange={handleChange}
+                  required disabled={loading}
                 />
               </div>
 
               <div className="form-group">
                 <label htmlFor="message" className="form-label">Message *</label>
                 <textarea
-                  id="message"
-                  name="message"
+                  id="message" name="message"
                   className="form-input form-textarea"
-                  placeholder="Tell me about your project, timeline, budget, and any specific requirements..."
-                  rows={6}
-                  value={form.message}
+                  placeholder="Tell me about your project..."
+                  rows={6} value={form.message}
                   onChange={handleChange}
-                  required
-                  disabled={loading}
+                  required disabled={loading}
                 />
               </div>
 
               <button
-                id="submitBtn"
                 type="submit"
                 className={`btn btn--primary btn--full ${loading ? 'btn--loading' : ''}`}
                 disabled={loading}
               >
                 {loading ? (
-                  <>
-                    <span className="spinner" />
-                    Sending...
-                  </>
+                  <><span className="spinner" />Sending...</>
                 ) : (
-                  <>
-                    Send Message
+                  <>Send Message
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                       <path d="M2 8l12-6-6 12-1.5-5.5L2 8z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </>
                 )}
               </button>
-
-              <p className="form-note">
-                🔒 Your information is secure and will never be shared with third parties.
-              </p>
+              <p className="form-note">🔒 Your information is secure and will never be shared.</p>
             </form>
           </div>
         </div>

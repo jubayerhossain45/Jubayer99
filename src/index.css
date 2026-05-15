@@ -193,46 +193,7 @@ ul { list-style: none; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ---------- 6. Scroll Animations ---------- */
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.animate-on-scroll.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Vercel / production fallback — JS দেরিতে load হলেও দেখাবে */
-.js-loaded .animate-on-scroll {
-  opacity: 1;
-  transform: none;
-}
-.animate-on-scroll.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Hero staggered animations */
-.animate-stagger-1,
-.animate-stagger-2,
-.animate-stagger-3,
-.animate-stagger-4,
-.animate-stagger-5 {
-  opacity: 0;
-  transform: translateY(24px);
-  animation: fadeUp 0.7s ease forwards;
-}
-.animate-stagger-1 { animation-delay: 0.1s; }
-.animate-stagger-2 { animation-delay: 0.25s; }
-.animate-stagger-3 { animation-delay: 0.4s; }
-.animate-stagger-4 { animation-delay: 0.55s; }
-.animate-stagger-5 { animation-delay: 0.7s; }
-
-@keyframes fadeUp {
-  to { opacity: 1; transform: none; }
-}
+ 
 
 /* ---------- 7. Navbar ---------- */
 .navbar {
