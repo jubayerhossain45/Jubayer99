@@ -236,18 +236,27 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // ── Scroll Animations ────────────────────────────────────
-  (function initScrollAnimations() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('is-visible');
-        }
-      });
-    }, { threshold: 0.1 });
+(function initScrollAnimations() {
+  const elements = document.querySelectorAll('.animate-on-scroll');
 
-    document.querySelectorAll('.animate-on-scroll')
-      .forEach(el => observer.observe(el));
-  })();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+      }
+    });
+  }, {
+    threshold: 0.1,
+    root: null
+  });
+
+  elements.forEach(el => observer.observe(el));
+
+  // 🔥 fallback (IMPORTANT for Vercel bug)
+  setTimeout(() => {
+    elements.forEach(el => el.classList.add('is-visible'));
+  }, 1500);
+})();
 
   // ── Skill Bars ───────────────────────────────────────────
   (function initSkillBars() {
