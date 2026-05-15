@@ -6,27 +6,44 @@ require("dotenv").config();
 
 const app = express();
 
-/* =========================
-   MIDDLEWARE
-========================= */
-app.use(cors());
+/* ================= CORS ================= */
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://your-vercel-app.vercel.app"
+  ],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
+
 app.use(express.json());
 
-/* =========================
-   MONGODB CONNECT
-========================= */
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("✅ MongoDB Connected");
-  })
-  .catch((err) => {
-    console.log("❌ MongoDB Error:", err.message);
-  });
+/* ================= ENV CHECK ================= */
+if (!process.env.MONGODB_URI) {
+  console.log("❌ MONGODB_URI missing");
+}
 
-/* =========================
-   NODEMAILER
-========================= */
+if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+  console.log("❌ Gmail env missing");
+}
+
+/* ================= MONGODB ================= */
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ Mongo Error:", err.message));
+
+/* ================= SCHEMA ================= */
+const ContactSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  subject: String,
+  message: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Contact = mongoose.model("Contact", ContactSchema);
+
+/* ================= NODEMAILER ================= */
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -35,111 +52,61 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/* =========================
-   GMAIL VERIFY
-========================= */
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ Gmail Error:", error.message);
-  } else {
-    console.log("✅ Gmail Ready");
-  }
-});
-
-/* =========================
-   TEST ROUTE
-========================= */
+/* ================= TEST ROUTE ================= */
 app.get("/", (req, res) => {
-  res.send("✅ Backend Running");
+  res.send("Backend Running OK");
 });
 
-/* =========================
-   CONTACT API
-========================= */
+app.get("/api/test", (req, res) => {
+  res.json({ success: true });
+});
+
+/* ================= CONTACT API ================= */
 app.post("/api/contact", async (req, res) => {
-
   try {
+    const { name, email, subject, message } = req.body;
 
-    console.log("==================================");
-    console.log("📩 নতুন Form Submit হয়েছে");
-
-    const { name, email, message } = req.body;
-
-    /* =========================
-       SHOW TERMINAL DATA
-    ========================= */
-    console.log("👤 Name:", name);
-    console.log("📧 Email:", email);
-    console.log("💬 Message:", message);
-
-    /* =========================
-       VALIDATION
-    ========================= */
     if (!name || !email || !message) {
-
-      console.log("❌ Missing Fields");
-
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "All fields required"
       });
     }
 
-    /* =========================
-       SEND EMAIL
-    ========================= */
+    /* SAVE TO DB */
+    const saved = await Contact.create({
+      name,
+      email,
+      subject,
+      message
+    });
+
+    console.log("📦 Saved:", saved);
+
+    /* SEND EMAIL */
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: process.env.OWNER_EMAIL,
-      subject: `New Message From ${name}`,
-
+      subject: `New Message: ${subject || "No Subject"}`,
       html: `
-        <h2>📩 New Portfolio Message</h2>
-
-        <p>
-          <strong>Name:</strong> ${name}
-        </p>
-
-        <p>
-          <strong>Email:</strong> ${email}
-        </p>
-
-        <p>
-          <strong>Message:</strong><br/>
-          ${message}
-        </p>
-      `,
+        <h2>New Contact Message</h2>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Message:</b> ${message}</p>
+      `
     });
 
-    console.log("✅ Email Sent Successfully");
-    console.log("==================================");
+    res.json({ success: true, message: "Message sent" });
 
-    /* =========================
-       SUCCESS RESPONSE
-    ========================= */
-    return res.status(200).json({
-      success: true,
-      message: "Message Sent Successfully",
-    });
-
-  } catch (error) {
-
-    console.log("❌ FULL ERROR:");
-    console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: error.message,
-    });
+  } catch (err) {
+    console.log("❌ ERROR:", err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-/* =========================
-   SERVER START
-========================= */
+/* ================= START ================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server Running On Port ${PORT}`);
+  console.log("🚀 Server running on port", PORT);
 });

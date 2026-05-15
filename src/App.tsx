@@ -32,7 +32,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Intersection Observer for scroll animations
+    const els = document.querySelectorAll('.animate-on-scroll');
+
+    // সাথে সাথে visible করে দাও — JS late load হলেও যেন hidden না থাকে
+    els.forEach(el => el.classList.add('is-visible'));
+
+    // তারপর observer দিয়ে animation চালাও
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -44,8 +49,10 @@ export default function App() {
       { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
     );
 
-    const animatedEls = document.querySelectorAll('.animate-on-scroll');
-    animatedEls.forEach(el => observer.observe(el));
+    els.forEach(el => {
+      el.classList.remove('is-visible'); // আবার hide করো animation এর জন্য
+      observer.observe(el);
+    });
 
     return () => observer.disconnect();
   }, []);

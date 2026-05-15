@@ -198,6 +198,15 @@ ul { list-style: none; }
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.65s ease, transform 0.65s ease;
+  will-change: opacity, transform;
+}
+
+/* JS disabled বা slow হলেও content দেখা যাবে */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll {
+    opacity: 1;
+    transform: none;
+  }
 }
 .animate-on-scroll.is-visible {
   opacity: 1;
