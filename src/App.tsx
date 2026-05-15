@@ -32,29 +32,34 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const els = document.querySelectorAll('.animate-on-scroll');
+    // React render হওয়ার পর একটু delay দিয়ে observer চালাও
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+            }
+          });
+        },
+        { threshold: 0.05, rootMargin: '0px 0px -40px 0px' }
+      );
 
-    // সাথে সাথে visible করে দাও — JS late load হলেও যেন hidden না থাকে
-    els.forEach(el => el.classList.add('is-visible'));
+      const animatedEls = document.querySelectorAll('.animate-on-scroll');
+      animatedEls.forEach(el => observer.observe(el));
 
-    // তারপর observer দিয়ে animation চালাও
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-    );
+      // যেসব element ইতিমধ্যে viewport এ আছে সেগুলো সাথে সাথে দেখাও
+      animatedEls.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight) {
+          el.classList.add('is-visible');
+        }
+      });
 
-    els.forEach(el => {
-      el.classList.remove('is-visible'); // আবার hide করো animation এর জন্য
-      observer.observe(el);
-    });
+      return () => observer.disconnect();
+    }, 100);
 
-    return () => observer.disconnect();
+    return () => clearTimeout(timer);
   }, []);
 
   return (
